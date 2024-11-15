@@ -25,8 +25,8 @@ public class Routes extends RouteBuilder {
                 String XMLInput = e.getIn().getBody(String.class);
                 e.getIn().setBody(XMLInput);
             })
-            .log(".................................Input.................................")
-            .log(body().toString())
+            //.log(".................................Input.................................")
+            //.log(body().toString())
             .process(new FhirValidationProcessor())
             .choice()
                 .when(header("validation-passed").isEqualTo(true))
@@ -35,6 +35,7 @@ public class Routes extends RouteBuilder {
                 .otherwise()
                     .log("❌ Invalid FHIR message: ${header.fhir-resouce}")
                     .log("Error: ${header.validation-error}")
+                    .log(body().toString())
                     .setBody(simple("Invalid FHIR message: ${header.fhir-resouce}\n Error: ${header.validation-error}"));
             
         from("undertow:http://localhost:8080/cdaToFhir")

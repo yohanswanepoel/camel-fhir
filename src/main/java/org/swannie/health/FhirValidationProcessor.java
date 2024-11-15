@@ -86,7 +86,6 @@ public class FhirValidationProcessor implements Processor {
             }
             
             if (errors.isEmpty()) {
-                logger.info("Validation Failed .....................................");
                 logger.info("✅ Valid resource: {}", resource.fhirType());
                 if (!warnings.isEmpty()) {
                     logger.info("⚠️  Warnings:");
@@ -99,7 +98,6 @@ public class FhirValidationProcessor implements Processor {
                 exchange.getMessage().setHeader("validation-passed", true);
                 exchange.getMessage().setBody(content);
             } else {
-                logger.info("Validation Failed .....................................");
                 StringBuilder errorMsg = new StringBuilder();
                 errorMsg.append(String.format("❌ Invalid resource: %s\n", resource.fhirType()));
                 errorMsg.append("Validation Messages:\n");
