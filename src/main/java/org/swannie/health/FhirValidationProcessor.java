@@ -26,11 +26,13 @@ public class FhirValidationProcessor implements Processor {
     private final FhirContext fhirContext;
     private final FhirValidator validator;
     private final IParser jsonParser;
+    private final IParser xmlParser;
 
     public FhirValidationProcessor() {
         this.fhirContext = FhirContext.forR4B();
         this.validator = fhirContext.newValidator();
         this.jsonParser = fhirContext.newJsonParser();
+        this.xmlParser = fhirContext.newXmlParser();
         
         // Create a validation chain
         ValidationSupportChain validationSupport = new ValidationSupportChain(
@@ -54,10 +56,6 @@ public class FhirValidationProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         String content = exchange.getIn().getBody(String.class); //new String(exchange.getIn().getBody), StandardCharsets.UTF_8);
-        logger.debug(".....................................");
-        logger.debug(".....................................");
-        logger.debug(".....................................");
-        logger.debug(content);
         try {
             // Parse FHIR resource
             IBaseResource resource = jsonParser.parseResource(content);
@@ -96,7 +94,8 @@ public class FhirValidationProcessor implements Processor {
                     info.forEach(i -> logger.info("  - {}: {}", i.location(), i.message()));
                 }
                 exchange.getMessage().setHeader("validation-passed", true);
-                exchange.getMessage().setBody(content);
+                String xmlContent = xmlParser.encodeResourceToString(resource);
+                exchange.getMessage().setBody(xmlContent);
             } else {
                 StringBuilder errorMsg = new StringBuilder();
                 errorMsg.append(String.format("❌ Invalid resource: %s\n", resource.fhirType()));

@@ -25,11 +25,11 @@ public class Routes extends RouteBuilder {
                 String XMLInput = e.getIn().getBody(String.class);
                 e.getIn().setBody(XMLInput);
             })
-            //.log(".................................Input.................................")
-            //.log(body().toString())
+            // Validate the message and convert to XML - now we can pass it to XML Transform if valid
             .process(new FhirValidationProcessor())
             .choice()
                 .when(header("validation-passed").isEqualTo(true))
+                    // Pass to XSL transform if message is valid 
                     .log("✅ Valid FHIR message: ${header.fhir-resouce}")
                     .setBody(simple("Valid FHIR message: ${header.fhir-resouce}"))
                 .otherwise()
