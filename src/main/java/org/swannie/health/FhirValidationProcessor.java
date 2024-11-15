@@ -64,7 +64,7 @@ public class FhirValidationProcessor implements Processor {
             logger.info("Parsed resource type: {}", resource.fhirType());
             // Validate
             ValidationResult results = validator.validateWithResult(resource);
-            logger.info("Validated .....................................");
+            
             // Collect issues by severity
             List<ValidationIssue> errors = new ArrayList<>();
             List<ValidationIssue> warnings = new ArrayList<>();
@@ -85,6 +85,7 @@ public class FhirValidationProcessor implements Processor {
             }
             
             if (errors.isEmpty()) {
+                logger.info("Validation Failed .....................................");
                 logger.info("✅ Valid resource: {}", resource.fhirType());
                 if (!warnings.isEmpty()) {
                     logger.info("⚠️  Warnings:");
@@ -97,8 +98,9 @@ public class FhirValidationProcessor implements Processor {
                 exchange.getMessage().setHeader("validation-passed", true);
                 exchange.getMessage().setBody(content);
             } else {
+                logger.info("Validation Failed .....................................");
                 StringBuilder errorMsg = new StringBuilder();
-                errorMsg.append(String.format("❌ Invalid %s resource: %s\n", resource.fhirType()));
+                errorMsg.append(String.format("❌ Invalid resource: %s\n", resource.fhirType()));
                 errorMsg.append("Validation Messages:\n");
                 errors.forEach(e -> errorMsg.append(String.format("❌ %s: %s\n", e.location(), e.message())));
                 
