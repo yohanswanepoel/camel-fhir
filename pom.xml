@@ -14,9 +14,22 @@
         <hapi.version>7.4.4</hapi.version>
         <ucum.version>1.0.8</ucum.version>
         <camel.version>4.8.1</camel.version>
+        <spring.boot.version>3.3.4</spring.boot.version>
+        <javax.servlet.api.version>4.0.1</javax.servlet.api.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-spring-boot-starter</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-platform-http-starter</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
+        
         <!-- Camel Dependencies -->
         <dependency>
             <groupId>org.apache.camel</groupId>
@@ -34,8 +47,6 @@
             <version>${camel.version}</version>
         </dependency>
 
-        
-        
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-spring-jdbc</artifactId>
@@ -49,24 +60,8 @@
         </dependency>
         
         <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-platform-http-starter</artifactId>
-            <version>${camel.version}</version>
-        </dependency>
-        <dependency>
-			<groupId>org.apache.camel.springboot</groupId>
-			<artifactId>camel-undertow-starter</artifactId>
-            <version>${camel.version}</version>
-		</dependency>
-
-        <!--dependency>
             <groupId>org.apache.camel</groupId>
-            <artifactId>xslt</artifactId>
-            <version>${camel.version}</version>
-        </dependency-->
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-file</artifactId>
+            <artifactId>camel-platform-http</artifactId>
             <version>${camel.version}</version>
         </dependency>
 
@@ -145,6 +140,28 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+                <configuration>
+                    
+                    <archive>
+                        <manifest>
+                            <mainClass>org.swannie.health.StarterApp</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <!--plugins>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
@@ -175,6 +192,6 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
+        </plugins-->
     </build>
 </project>

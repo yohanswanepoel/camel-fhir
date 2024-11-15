@@ -2,74 +2,55 @@ package org.swannie.health;
 
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.rest.RestBindingMode;
+
+import org.springframework.stereotype.Component;
 
 /**
- * Camel route definitions.
+ * A simple Camel REST DSL route.
  */
+@Component
 public class Routes extends RouteBuilder {
-
-    private ResponseType response = new ResponseType("Hello World");
 
     @Override
     public void configure() throws Exception {
         
+        restConfiguration()
+				.bindingMode(RestBindingMode.json);
+
         onException(Exception.class)
             .handled(true)
             .log(LoggingLevel.ERROR, "Error processing file ${exception.message}")
             .setBody(simple("Boo boo happened"));
+  
+        from("direct:hello")
+            .log(LoggingLevel.INFO, "Hello World")
+            .transform().simple("Hello World");
 
-        //from("platform-http:/validate")
-        from("undertow:http://localhost:8080/validate")
+        from("platform-http:/validate")
             .routeId("fhir-validation")
-            .process(e -> {
-                String XMLInput = e.getIn().getBody(String.class);
-                e.getIn().setBody(XMLInput);
-            })
+            // Need to see if it is a post or get
             // Validate the message and convert to XML - now we can pass it to XML Transform if valid
-            .process(new FhirValidationProcessor())
+            .log("Camel Request Type:  ${header.CamelHttpMethod}")
             .choice()
-                .when(header("validation-passed").isEqualTo(true))
-                    // Pass to XSL transform if message is valid 
-                    .toD("xslt:transform/f2c-${header.fhir-resouce}.xsl")
-                    .log("✅ Valid FHIR message: ${header.fhir-resouce}")
+                .when(header("CamelHttpMethod").isEqualTo(("POST")))
+                    .log("Running Things")
                     .log(body().toString())
-                    //.setBody(simple("Valid FHIR message: ${header.fhir-resouce}"))
-                .otherwise()
-                    .log("❌ Invalid FHIR message: ${header.fhir-resouce}")
-                    .log("Error: ${header.validation-error}")
-                    .log(body().toString())
-                    .setBody(simple("Invalid FHIR message: ${header.fhir-resouce}\n Error: ${header.validation-error}"));
+                    .process(new FhirValidationProcessor())
+                    .choice()
+                        .when(header("validation-passed").isEqualTo(true))
+                            // Pass to XSL transform if message is valid 
+                            .toD("xslt:transform/f2c-${header.fhir-resouce}.xsl")
+                            .log("✅ Valid FHIR message: ${header.fhir-resouce}")
+                            .log(body().toString())
+                            //.setBody(simple("Valid FHIR message: ${header.fhir-resouce}"))
+                        .otherwise()
+                            .log("❌ Invalid FHIR message: ${header.fhir-resouce}")
+                            .log("Error: ${header.validation-error}")
+                            .log(body().toString())
+                            .setBody(simple("Invalid FHIR message: ${header.fhir-resouce}\n Error: ${header.validation-error}"));
             
-        from("undertow:http://localhost:8080/cdaToFhir")
-        //from("platform-http:/cdaToFhir")
-            .routeId("CDAToFHIRRoute")
-            //.to("log:DEBUG?showBody=true&showHeaders=true")
-            .process(e -> {
-                String XMLInput = e.getIn().getBody(String.class);
-                e.getIn().setBody(XMLInput);
-            })
-            .log(".................................Input.................................")
-            .log(body().toString())
-            .to("xslt:transform/cda-to-fhir.xsl") // Apply XSLT transformation
-            .process(exchange -> {
-                // Get the transformed output as a String (XML)
-                String xmlOutput = exchange.getIn().getBody(String.class);
-                // Strip the XML tags to get the JSON
-                // In this case, assuming the output from the XSLT is a valid JSON string
-                //String jsonOutput = stripXml(xmlOutput);
-                // Set the stripped JSON as the new body
-                exchange.getIn().setBody(xmlOutput);
-            })
-            .log(".................................Output.................................")
-            .log(body().toString());
-            //.setBody(simple("Hello World"));
-            
-        /*from("direct:sayHello")
-            .routeId("sayHello")
-            .log("Message")
-            .setBody(simple("Hello World"))
-            .log("test");*/
-            
+        
     }
     
     

@@ -16,24 +16,21 @@
  */
 package org.swannie.health;
 
-import org.apache.camel.main.Main;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 //CHECKSTYLE:OFF
 /**
  * A sample Spring Boot application that starts the Camel routes.
  */
+@SpringBootApplication
 public class StarterApp {
-    private static final Logger logger = LoggerFactory.getLogger(StarterApp.class);
     /**
      * A main method to start this application.
      */
-    public static void main(String[] args) throws Exception {
-        Main main = new Main();
-        main.configure().addRoutesBuilder(new Routes());
-        logger.info("Starting FHIR validation service...");
-        main.run();
+    public static void main(String[] args) {
+        SpringApplication.run(StarterApp.class, args);
+
     }
 
 
