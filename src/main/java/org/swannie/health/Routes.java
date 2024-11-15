@@ -18,7 +18,8 @@ public class Routes extends RouteBuilder {
             .log(LoggingLevel.ERROR, "Error processing file ${exception.message}")
             .setBody(simple("Boo boo happened"));
 
-        from("platform-http:/validate")
+        //from("platform-http:/validate")
+        from("undertow:http://localhost:8080/validate")
             .routeId("fhir-validation")
             .process(e -> {
                 String XMLInput = e.getIn().getBody(String.class);
@@ -36,7 +37,8 @@ public class Routes extends RouteBuilder {
                     .log("Error: ${header.validation-error}")
                     .setBody(simple("Not Valid"));
             
-        from("platform-http:/cdaToFhir")
+        from("undertow:http://localhost:8080/cdaToFhir")
+        //from("platform-http:/cdaToFhir")
             .routeId("CDAToFHIRRoute")
             //.to("log:DEBUG?showBody=true&showHeaders=true")
             .process(e -> {
