@@ -30,7 +30,7 @@ public class Routes extends RouteBuilder {
             .choice()
                 .when(header("validation-passed").isEqualTo(true))
                     // Pass to XSL transform if message is valid 
-                    .to("xslt:transform/f2c-Patient.xsl")
+                    .toD("xslt:transform/f2c-${header.fhir-resouce}.xsl")
                     .log("✅ Valid FHIR message: ${header.fhir-resouce}")
                     .log(body().toString())
                     //.setBody(simple("Valid FHIR message: ${header.fhir-resouce}"))
