@@ -7,7 +7,8 @@ mvn org.springframework.boot:spring-boot-maven-plugin:run
 Building
 ```bash
 mvn clean install
-java -jar target/fhir-to-cda-tester-1.0.0-SNAPSHOT-jar-with-dependencies.jar
+java -jar target/fhir-to-cda-tester-1.0.0-SNAPSHOT.jar
+
 ```
 
 ```bash
