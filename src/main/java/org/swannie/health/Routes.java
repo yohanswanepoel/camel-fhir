@@ -30,12 +30,12 @@ public class Routes extends RouteBuilder {
             .process(new FhirValidationProcessor())
             .choice()
                 .when(header("validation-passed").isEqualTo(true))
-                    .log("✅ Valid FHIR message: ${header.CamelFileName}")
-                    .setBody(simple("Valid"))
+                    .log("✅ Valid FHIR message: ${header.fhir-resouce}")
+                    .setBody(simple("Valid FHIR message: ${header.fhir-resouce}"))
                 .otherwise()
-                    .log("❌ Invalid FHIR message: ${header.CamelFileName}")
+                    .log("❌ Invalid FHIR message: ${header.fhir-resouce}")
                     .log("Error: ${header.validation-error}")
-                    .setBody(simple("Not Valid"));
+                    .setBody(simple("Invalid FHIR message: ${header.fhir-resouce}\n Error: ${header.validation-error}"));
             
         from("undertow:http://localhost:8080/cdaToFhir")
         //from("platform-http:/cdaToFhir")

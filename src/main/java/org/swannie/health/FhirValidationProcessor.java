@@ -70,6 +70,7 @@ public class FhirValidationProcessor implements Processor {
             List<ValidationIssue> warnings = new ArrayList<>();
             List<ValidationIssue> info = new ArrayList<>();
             
+            exchange.getMessage().setHeader("fhir-resouce",resource.fhirType());
             for (SingleValidationMessage message : results.getMessages()) {
                 ValidationIssue issue = new ValidationIssue(
                     message.getSeverity().name(),
