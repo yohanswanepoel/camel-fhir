@@ -33,3 +33,12 @@ java -jar target/fhir-to-cda-tester-1.0.0-SNAPSHOT.jar --env.xslhost="http://10.
 * container builds
 * Hardcoded IP as env.xslhost in application.properties - would like to externalise mores
 
+```bash
+podman build . -t f2c-demo-camel
+podman run --rm --name f2c-demo-camel -p 8080:8080 -e env.xslhost="http://xslhost/api/xsl?name=" -e env.fhirhost="http://fhirhost:8090/fhir" f2c-demo-camel
+```
+
+Building to push to x86 repo
+```bash
+podman build . -t f2c-demo-camel --platform linux/amd64
+```
