@@ -7,7 +7,7 @@ mvn org.springframework.boot:spring-boot-maven-plugin:run
 Building
 ```bash
 mvn clean install
-java -jar target/fhir-to-cda-tester-1.0.0-SNAPSHOT.jar
+java -jar target/fhir-to-cda-tester-1.0.0-SNAPSHOT.jar --env.xslhost="http://10.215.66.15:5500/api/xsl?name="
 
 ```
 
@@ -26,4 +26,5 @@ java -jar target/fhir-to-cda-tester-1.0.0-SNAPSHOT.jar
 
 ## TODO
 * container builds
-* Hardcoded IP in the route at the moment not good practice (need to fix)
+* Hardcoded IP as env.xslhost in application.properties - would like to externalise mores
+

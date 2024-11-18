@@ -40,12 +40,12 @@ public class Routes extends RouteBuilder {
                     .choice()
                         .when(header("validation-passed").isEqualTo(true))
                             // Pass to XSL transform if message is valid 
-                            .toD("xslt:http://10.215.66.15:5500/api/xsl?name=${header.fhir-resouce}")
-                            .log("✅ Valid FHIR message: ${header.fhir-resouce}")
+                            .toD("xslt:{{env.xslhost}}${header.fhir-resouce}")
+                            .log("Valid FHIR message: ${header.fhir-resouce}")
                             .log(body().toString())
                             //.setBody(simple("Valid FHIR message: ${header.fhir-resouce}"))
                         .otherwise()
-                            .log("❌ Invalid FHIR message: ${header.fhir-resouce}")
+                            .log("Invalid FHIR message: ${header.fhir-resouce}")
                             .log("Error: ${header.validation-error}")
                             .log(body().toString())
                             .setBody(simple("Invalid FHIR message: ${header.fhir-resouce}\n Error: ${header.validation-error}"));
@@ -64,11 +64,11 @@ public class Routes extends RouteBuilder {
                         .when(header("validation-passed").isEqualTo(true))
                             // Pass to XSL transform if message is valid 
                             .toD("xslt:transform/f2c-${header.fhir-resouce}.xsl")
-                            .log("✅ Valid FHIR message: ${header.fhir-resouce}")
+                            .log("Valid FHIR message: ${header.fhir-resouce}")
                             .log(body().toString())
                             //.setBody(simple("Valid FHIR message: ${header.fhir-resouce}"))
                         .otherwise()
-                            .log("❌ Invalid FHIR message: ${header.fhir-resouce}")
+                            .log("Invalid FHIR message: ${header.fhir-resouce}")
                             .log("Error: ${header.validation-error}")
                             .log(body().toString())
                             .setBody(simple("Invalid FHIR message: ${header.fhir-resouce}\n Error: ${header.validation-error}"));
