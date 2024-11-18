@@ -21,7 +21,7 @@ public class Routes extends RouteBuilder {
         onException(Exception.class)
             .handled(true)
             .log(LoggingLevel.ERROR, "Error processing file ${exception.message}")
-            .setBody(simple("Boo boo happened"));
+            .setBody(simple("Error processing file ${exception.message}"));
   
         from("direct:hello")
             .log(LoggingLevel.INFO, "Hello World")
@@ -29,21 +29,31 @@ public class Routes extends RouteBuilder {
 
         from("platform-http:/dynamicRoute")
             .routeId("dynamicRoute")
-            // Need to see if it is a post or get
-            // Validate the message and convert to XML - now we can pass it to XML Transform if valid
-            .log("Camel Request Type:  ${header.CamelHttpMethod}")
+            //.log("Camel Route to FHIR: ${header.CamelHttpQuery}")
+            // USEFUL FOR DEBUGGING 
+            // .log("Header... ${headers}")
             .choice()
                 .when(header("CamelHttpMethod").isEqualTo(("POST")))
                     .log("Running Things")
-                    .log(body().toString())
                     .process(new FhirValidationProcessor())
+                    .setProperty("XML_Body", body())
                     .choice()
                         .when(header("validation-passed").isEqualTo(true))
-                            // Pass to XSL transform if message is valid 
-                            .toD("xslt:{{env.xslhost}}${header.fhir-resouce}")
-                            .log("Valid FHIR message: ${header.fhir-resouce}")
-                            .log(body().toString())
-                            //.setBody(simple("Valid FHIR message: ${header.fhir-resouce}"))
+                            .choice()
+                                .when(simple("${header.toFHIR} == 'Y'"))
+                                    .convertBodyTo(String.class)
+                                    .toD("fhir://create/resource?inBody=resourceAsString&encoding=XML&serverUrl={{env.fhirhost}}&fhirVersion={{env.fhirVersion}}")
+                                    // log the outcome
+                                    .log("${header.fhir-resouce} created successfully: ${body}")
+                                    .setProperty("FHIR_Response", body())
+                                // Pass to XSL transform if message is valid 
+                                .setBody(exchangeProperty("XML_Body"))
+                                .toD("xslt:{{env.xslhost}}${header.fhir-resouce}")
+                                .log("Valid FHIR message: ${header.fhir-resouce}")
+                                //.log(body().toString())
+                                .setBody(simple("FHIR Server Create Success: ${exchangeProperty.FHIR_Response}!\\n\\n ${body} "))
+                                //.setBody(simple("Valid FHIR message: ${header.fhir-resouce}"))
+                            .endChoice()
                         .otherwise()
                             .log("Invalid FHIR message: ${header.fhir-resouce}")
                             .log("Error: ${header.validation-error}")

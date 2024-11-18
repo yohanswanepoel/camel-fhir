@@ -4,10 +4,15 @@ Runnning for dev
 mvn org.springframework.boot:spring-boot-maven-plugin:run
 ```
 
+Starting FHIR server
+```
+podman run -p 8090:8080 hapiproject/hapi:latest
+```
+
 Building
 ```bash
 mvn clean install
-java -jar target/fhir-to-cda-tester-1.0.0-SNAPSHOT.jar --env.xslhost="http://10.215.66.15:5500/api/xsl?name="
+java -jar target/fhir-to-cda-tester-1.0.0-SNAPSHOT.jar --env.xslhost="http://10.215.66.15:5500/api/xsl?name=" --env.fhirhost="http://10.215.66.15:8090/fhir"
 
 ```
 

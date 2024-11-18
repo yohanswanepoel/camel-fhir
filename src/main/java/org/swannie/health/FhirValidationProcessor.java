@@ -87,13 +87,13 @@ public class FhirValidationProcessor implements Processor {
             }
             
             if (errors.isEmpty()) {
-                logger.info("✅ Valid resource: {}", resource.fhirType());
+                logger.info("Valid resource: {}", resource.fhirType());
                 if (!warnings.isEmpty()) {
                     logger.info("⚠️  Warnings:");
                     warnings.forEach(w -> logger.info("  - {}: {}", w.location(), w.message()));
                 }
                 if (!info.isEmpty()) {
-                    logger.info("ℹ️  Information:");
+                    logger.info("Information:");
                     info.forEach(i -> logger.info("  - {}: {}", i.location(), i.message()));
                 }
                 exchange.getMessage().setHeader("validation-passed", true);
@@ -101,9 +101,9 @@ public class FhirValidationProcessor implements Processor {
                 exchange.getMessage().setBody(xmlContent);
             } else {
                 StringBuilder errorMsg = new StringBuilder();
-                errorMsg.append(String.format("❌ Invalid resource: %s\n", resource.fhirType()));
+                errorMsg.append(String.format("Invalid resource: %s\n", resource.fhirType()));
                 errorMsg.append("Validation Messages:\n");
-                errors.forEach(e -> errorMsg.append(String.format("❌ %s: %s\n", e.location(), e.message())));
+                errors.forEach(e -> errorMsg.append(String.format("Error %s: %s\n", e.location(), e.message())));
                 
                 logger.error(errorMsg.toString());
                 exchange.getMessage().setHeader("validation-passed", false);
@@ -114,10 +114,8 @@ public class FhirValidationProcessor implements Processor {
             }
 
         } catch (Exception e) {
-            logger.error("ERROR .....................................");
-            logger.error("❌ Error processing: {}", e.getMessage());
+            logger.error("Error processing: {}", e.getMessage());
             logger.error(e.toString());
-            logger.error("ERROR .....................................");
             exchange.getMessage().setHeader("validation-passed", false);
             exchange.getMessage().setHeader("validation-error", e.getMessage());
             exchange.getMessage().setBody(content);
