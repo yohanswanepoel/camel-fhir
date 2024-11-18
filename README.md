@@ -23,3 +23,7 @@ java -jar target/fhir-to-cda-tester-1.0.0-SNAPSHOT.jar
 
   curl -X POST -d '{"key1":"value1", "key2":"value2"}' -H "Content-Type: application/xml" http://localhost:8080/hello 
 ```
+
+## TODO
+* container builds
+* Hardcoded IP in the route at the moment not good practice (need to fix)
