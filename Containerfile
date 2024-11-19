@@ -1,5 +1,5 @@
 # Build stage
-FROM fedora:latest as builder
+FROM fedora:41 as builder
 
 # Install build dependencies
 RUN dnf update -y && \
@@ -30,8 +30,8 @@ RUN dnf update -y && \
 # Set JAVA_HOME and default environment variables
 ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk \
     JAVA_OPTS="-Xms512m -Xmx512m --enable-preview" \
-    env.xslhost="http://xslhost/api/xsl?name=" \
-    env.fhirhost="http://fhirhost:8090/fhir"
+    env_xslhost="http://xslhost:5500/api/xsl?name=" \
+    env_fhirhost="http://fhirhost:8080/fhir"
 
 # Create user with ID 1001 for OpenShift compatibility
 RUN useradd -m -r -u 1001 cameluser
@@ -54,6 +54,6 @@ EXPOSE 8080
 
 # Command to run the application with environment variables
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS \
-    -Denv.xslhost=\"$env.xslhost\" \
-    -Denv.fhirhost=\"$env.fhirhost\" \
+    -Denv.xslhost=\"$env_xslhost\" \
+    -Denv.fhirhost=\"$env_fhirhost\" \
     -jar app.jar"]
