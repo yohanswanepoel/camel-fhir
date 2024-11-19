@@ -29,6 +29,7 @@ public class StarterApp {
      * A main method to start this application.
      */
     public static void main(String[] args) {
+        System.setProperty("hawtio.authenticationEnabled", "false");
         SpringApplication.run(StarterApp.class, args);
 
     }

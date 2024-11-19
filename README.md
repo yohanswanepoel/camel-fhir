@@ -42,3 +42,7 @@ Building to push to x86 repo
 ```bash
 podman build . -t f2c-demo-camel --platform linux/amd64
 ```
+
+### Monitoring
+Hawtio enable
+http://[ip]:8080/actuator/hawtio
