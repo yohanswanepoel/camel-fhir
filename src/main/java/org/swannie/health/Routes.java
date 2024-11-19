@@ -22,10 +22,6 @@ public class Routes extends RouteBuilder {
             .handled(true)
             .log(LoggingLevel.ERROR, "Error processing file ${exception.message}")
             .setBody(simple("Error processing file ${exception.message}"));
-  
-        from("direct:hello")
-            .log(LoggingLevel.INFO, "Hello World")
-            .transform().simple("Hello World");
 
         from("platform-http:/dynamicRoute")
             .routeId("dynamicRoute")
