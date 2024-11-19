@@ -37,24 +37,29 @@ public class Routes extends RouteBuilder {
                         .when(header("validation-passed").isEqualTo(true))
                             .choice()
                                 .when(simple("${header.toFHIR} == 'Y'"))
+                                // Send message to FHIR
                                     .convertBodyTo(String.class)
                                     .toD("fhir://create/resource?inBody=resourceAsString&encoding=XML&serverUrl={{env.fhirhost}}&fhirVersion={{env.fhirVersion}}")
                                     // log the outcome
                                     .log("${header.fhir-resouce} created successfully: ${body}")
                                     .setProperty("FHIR_Response", body())
-                                // Pass to XSL transform if message is valid 
-                                .setBody(exchangeProperty("XML_Body"))
-                                .toD("xslt:{{env.xslhost}}${header.fhir-resouce}")
-                                .log("Valid FHIR message: ${header.fhir-resouce}")
-                                //.log(body().toString())
-                                .setBody(simple("FHIR Server Create Success: ${exchangeProperty.FHIR_Response}!\\n\\n ${body} "))
-                                //.setBody(simple("Valid FHIR message: ${header.fhir-resouce}"))
+                                    .setHeader("fhir_updated",constant("yes"))
                             .endChoice()
-                        .otherwise()
-                            .log("Invalid FHIR message: ${header.fhir-resouce}")
-                            .log("Error: ${header.validation-error}")
-                            .log(body().toString())
-                            .setBody(simple("Invalid FHIR message: ${header.fhir-resouce}\n Error: ${header.validation-error}"));
+                            // Pass to XSL transform if message is valid 
+                            .setBody(exchangeProperty("XML_Body"))
+                            .toD("xslt:{{env.xslhost}}${header.fhir-resouce}")
+                            .setHeader("message_transformed",constant("yes"))
+                            .log("Valid FHIR message: ${header.fhir-resouce}")
+                            //.log(body().toString())
+                            .setBody(simple("FHIR Server Create Success: ${exchangeProperty.FHIR_Response}!\\n\\n ${body} "))
+                            //.setBody(simple("Valid FHIR message: ${header.fhir-resouce}"))
+                    .otherwise()
+                        .log("Invalid FHIR message: ${header.fhir-resouce}")
+                        .log("Error: ${header.validation-error}")
+                        .log(body().toString())
+                        .setBody(simple("(Validation Failed) - Invalid FHIR message: ${header.fhir-resouce}\n Error: ${header.validation-error}"))
+                    .endChoice()
+            .endChoice();
 
         from("platform-http:/validate")
             .routeId("fhir-validation")
