@@ -12,7 +12,7 @@ podman run -p 8090:8080 hapiproject/hapi:latest
 Building
 ```bash
 mvn clean install
-java -jar target/fhir-to-cda-tester-1.0.0-SNAPSHOT.jar --env.xslhost="http://10.215.66.15:5500/api/xsl?name=" --env.fhirhost="http://10.215.66.15:8090/fhir"
+java -jar target/fhir-to-cda-tester-1.0.0-SNAPSHOT.jar --env.xslhost="http://10.215.66.15:5500/api/xsl?name=" --env.fhirhost="http://10.215.66.15:8090/fhir" --env.cdahost="http://10.215.66.15:5500/cda_system"
 
 ```
 
@@ -35,7 +35,7 @@ java -jar target/fhir-to-cda-tester-1.0.0-SNAPSHOT.jar --env.xslhost="http://10.
 
 ```bash
 podman build . -t f2c-demo-camel
-podman run --rm --name f2c-demo-camel -p 8080:8080 -e env_xslhost="http://xslhost:5000/api/xsl?name=" -e env_fhirhost="http://fhirhost:8090/fhir" f2c-demo-camel
+podman run --rm --name f2c-demo-camel -p 8080:8080 -e env_xslhost="http://xslhost:5000/api/xsl?name=" -e env_fhirhost="http://fhirhost:8090/fhir" -e env_cdahost="http://10.215.66.15:5500/cda_system" f2c-demo-camel
 ```
 
 Building to push to x86 repo
@@ -46,3 +46,6 @@ podman build . -t f2c-demo-camel --platform linux/amd64
 ### Monitoring
 Hawtio enable
 http://[ip]:8080/actuator/hawtio
+
+
+java -jar target/fhir-to-cda-tester-1.0.0-SNAPSHOT.jar --env.xslhost="http://10.215.66.15:5500/api/xsl?name=" --env.fhirhost="http://10.215.66.15:8090/fhir" --env.cdahost="http://10.215.66.15:5500/cda_system"

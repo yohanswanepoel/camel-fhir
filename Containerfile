@@ -31,7 +31,8 @@ RUN dnf update -y && \
 ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk \
     JAVA_OPTS="-Xms512m -Xmx512m --enable-preview" \
     env_xslhost="http://xslhost:5500/api/xsl?name=" \
-    env_fhirhost="http://fhirhost:8080/fhir"
+    env_fhirhost="http://fhirhost:8080/fhir" \
+    env_cdahost="http://cdahost:5500/cda_system"
 
 # Create user with ID 1001 for OpenShift compatibility
 RUN useradd -m -r -u 1001 cameluser
@@ -56,4 +57,5 @@ EXPOSE 8080
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS \
     -Denv.xslhost=\"$env_xslhost\" \
     -Denv.fhirhost=\"$env_fhirhost\" \
+    -Denv.cdahost=\"$env_cdahost\" \
     -jar app.jar"]

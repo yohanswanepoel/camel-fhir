@@ -1,5 +1,6 @@
 package org.swannie.health;
 
+import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
@@ -49,6 +50,12 @@ public class Routes extends RouteBuilder {
                             .setBody(exchangeProperty("XML_Body"))
                             .toD("xslt:{{env.xslhost}}${header.fhir-resouce}")
                             .setHeader("message_transformed",constant("yes"))
+                            // Send the CDA message back to CDA service
+                            .log("Sending to CDA endpoint")
+                            .setHeader(Exchange.HTTP_METHOD, constant("POST"))
+                            .toD("{{env.cdahost}}?bridgeEndpoint=true")
+                            .setHeader("message_stored_cda",constant("yes"))
+                            .setBody(exchangeProperty("XML_Body"))
                             .log("Valid FHIR message: ${header.fhir-resouce}")
                             //.log(body().toString())
                             .setBody(simple("FHIR Server Create Success: ${exchangeProperty.FHIR_Response}!\\n\\n ${body} "))
