@@ -24,7 +24,6 @@ public class Routes extends RouteBuilder {
             .log(LoggingLevel.ERROR, "Error processing file ${exception.message}")
             .setBody(simple("Error processing file ${exception.message}"));
 
-        //from("rest:get:hello:/french/{me}")
         from("platform-http:/queryFHIRfromCDA/{object}/{id}")
             .routeId("getMessage")
             .log("get CDA return FHIR ${header.object} / ${header.id}")
@@ -39,8 +38,7 @@ public class Routes extends RouteBuilder {
                     .toD("{{env.fhirhost}}/${header.object}/${header.id}?bridgeEndpoint=true")
                     .log(body().toString())
             .endChoice()
-            .end();
-
+        .end();
 
         from("platform-http:/dynamicRoute")
             .routeId("dynamicRoute")
