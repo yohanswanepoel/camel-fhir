@@ -24,6 +24,17 @@ public class Routes extends RouteBuilder {
             .log(LoggingLevel.ERROR, "Error processing file ${exception.message}")
             .setBody(simple("Error processing file ${exception.message}"));
 
+        //from("rest:get:hello:/french/{me}")
+        from("platform-http:/queryFHIRfromCDA/{object}/{id}")
+            .log("get CDA return FHIR ${header.object} / ${header.id}")
+            .setHeader(Exchange.HTTP_METHOD, constant("GET"))
+            .toD("{{env.cdahost}}/${header.id}?bridgeEndpoint=true")
+            .log(body().toString())
+            .toD("xslt:{{env.xslhost}}${header.object}&direction=c2f")
+            .log(body().toString())
+            .end();
+
+
         from("platform-http:/dynamicRoute")
             .routeId("dynamicRoute")
             //.log("Camel Route to FHIR: ${header.CamelHttpQuery}")
@@ -48,7 +59,7 @@ public class Routes extends RouteBuilder {
                             .endChoice()
                             // Pass to XSL transform if message is valid 
                             .setBody(exchangeProperty("XML_Body"))
-                            .toD("xslt:{{env.xslhost}}${header.fhir-resouce}")
+                            .toD("xslt:{{env.xslhost}}${header.fhir-resouce}&direction=f2c")
                             .setHeader("message_transformed",constant("yes"))
                             // Send the CDA message back to CDA service
                             .log("Sending to CDA endpoint")
@@ -68,28 +79,7 @@ public class Routes extends RouteBuilder {
                     .endChoice()
             .endChoice();
 
-        from("platform-http:/validate")
-            .routeId("fhir-validation")
-            // Need to see if it is a post or get
-            // Validate the message and convert to XML - now we can pass it to XML Transform if valid
-            .log("Camel Request Type:  ${header.CamelHttpMethod}")
-            .choice()
-                .when(header("CamelHttpMethod").isEqualTo(("POST")))
-                    .log("Running Things")
-                    .log(body().toString())
-                    .process(new FhirValidationProcessor())
-                    .choice()
-                        .when(header("validation-passed").isEqualTo(true))
-                            // Pass to XSL transform if message is valid 
-                            .toD("xslt:transform/f2c-${header.fhir-resouce}.xsl")
-                            .log("Valid FHIR message: ${header.fhir-resouce}")
-                            .log(body().toString())
-                            //.setBody(simple("Valid FHIR message: ${header.fhir-resouce}"))
-                        .otherwise()
-                            .log("Invalid FHIR message: ${header.fhir-resouce}")
-                            .log("Error: ${header.validation-error}")
-                            .log(body().toString())
-                            .setBody(simple("Invalid FHIR message: ${header.fhir-resouce}\n Error: ${header.validation-error}"));
+        
             
         
     }
