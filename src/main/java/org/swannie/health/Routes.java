@@ -28,10 +28,16 @@ public class Routes extends RouteBuilder {
         from("platform-http:/queryFHIRfromCDA/{object}/{id}")
             .log("get CDA return FHIR ${header.object} / ${header.id}")
             .setHeader(Exchange.HTTP_METHOD, constant("GET"))
-            .toD("{{env.cdahost}}/${header.id}?bridgeEndpoint=true")
-            .log(body().toString())
-            .toD("xslt:{{env.xslhost}}${header.object}&direction=c2f")
-            .log(body().toString())
+            .choice()
+                .when(simple("${header.X-get-from} == 'cda'"))
+                    .toD("{{env.cdahost}}/${header.id}?bridgeEndpoint=true")
+                    .log(body().toString())
+                    .toD("xslt:{{env.xslhost}}${header.object}&direction=c2f")
+                    .log(body().toString())
+                .when(simple("${header.X-get-from} == 'fhir'"))
+                    .toD("{{env.fhirhost}}/${header.object}/${header.id}?bridgeEndpoint=true")
+                    .log(body().toString())
+            .endChoice()
             .end();
 
 
