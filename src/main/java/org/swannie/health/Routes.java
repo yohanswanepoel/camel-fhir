@@ -26,6 +26,7 @@ public class Routes extends RouteBuilder {
 
         //from("rest:get:hello:/french/{me}")
         from("platform-http:/queryFHIRfromCDA/{object}/{id}")
+            .routeId("getMessage")
             .log("get CDA return FHIR ${header.object} / ${header.id}")
             .setHeader(Exchange.HTTP_METHOD, constant("GET"))
             .choice()
